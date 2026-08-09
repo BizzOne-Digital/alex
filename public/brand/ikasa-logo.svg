@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240" role="img" aria-labelledby="ikasaLogoTitle ikasaLogoDesc">
+  <title id="ikasaLogoTitle">Ikasa Renovations</title>
+  <desc id="ikasaLogoDesc">Red geometric house roofline above IKASA wordmark and grey RENOVATIONS bar</desc>
+  <g>
+    <!-- Roofline with chimney and end trim -->
+    <path fill="#D60000" d="M48 92L320 22l232 58v12h-20V58h-28v22L320 42 68 92H48z"/>
+    <!-- IKASA letterforms as geometric paths -->
+    <g fill="#090909">
+      <!-- I -->
+      <rect x="128" y="108" width="18" height="46"/>
+      <!-- K -->
+      <path d="M168 108h18v46h-18v-18l28-14v-1l-22-13h-6zm28 1l24 14v2l-24 13v-15l10-6-10-6v-2z"/>
+      <!-- A -->
+      <path d="M236 154l18-46h16l18 46h-19l-3-9h-18l-3 9h-9zm22-22h10l-5-14-5 14z"/>
+      <!-- S -->
+      <path d="M310 112c10-5 28-4 36 4l-10 12c-5-5-14-6-20-3-4 2-4 5 2 7l14 5c14 5 18 14 10 24-9 12-32 13-46 4l10-13c7 5 18 6 24 2 4-2 4-5-2-7l-14-5c-15-5-20-15-10-24 2-2 4-4 6-6z"/>
+      <!-- A -->
+      <path d="M366 154l18-46h16l18 46h-19l-3-9h-18l-3 9h-9zm22-22h10l-5-14-5 14z"/>
+    </g>
+    <rect x="150" y="172" width="340" height="40" fill="#8E8E8E"/>
+    <g fill="#FFFFFF">
+      <!-- RENOVATIONS condensed caps -->
+      <text x="320" y="199" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="5.5">RENOVATIONS</text>
+    </g>
+  </g>
+</svg>

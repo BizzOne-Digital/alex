@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"published":{"$numberInt":"1"},"order":{"$numberInt":"1"}},"name":"published_1_order_1"},{"v":{"$numberInt":"2"},"key":{"featured":{"$numberInt":"1"}},"name":"featured_1"}],"uuid":"cbbc9158d50f466faa10f6b45fdb64bd","collectionName":"testimonials","type":"collection"}
