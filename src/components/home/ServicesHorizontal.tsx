@@ -12,6 +12,9 @@ import type { PublicServiceSummary } from "@/lib/data";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** Higher = more vertical scroll needed for the same horizontal travel. */
+const SLOW_FACTOR = 2.6;
+
 type ServicesHorizontalProps = {
   eyebrow?: string;
   heading: string;
@@ -27,29 +30,35 @@ export function ServicesHorizontal({
 }: ServicesHorizontalProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const scrollByCard = useCallback((direction: 1 | -1) => {
     const section = sectionRef.current;
     const track = trackRef.current;
-    if (!section || !track || typeof window === "undefined") return;
+    const scroller = scrollerRef.current;
+    if (!section || !track || !scroller) return;
+
+    const desktop = window.matchMedia("(min-width: 1024px)").matches;
+    const card = track.querySelector<HTMLElement>("[data-service-card]");
+    const step = (card?.offsetWidth ?? 320) + 20;
+
+    if (!desktop) {
+      scroller.scrollBy({ left: direction * step, behavior: "smooth" });
+      return;
+    }
 
     const maxX = Math.max(0, track.scrollWidth - window.innerWidth + 64);
     if (maxX <= 0) return;
 
-    const rect = section.getBoundingClientRect();
     const scrollable = section.offsetHeight - window.innerHeight;
     if (scrollable <= 0) return;
 
-    const currentProgress = Math.min(
-      1,
-      Math.max(0, -rect.top / scrollable),
-    );
-    const card = Math.min(window.innerWidth * 0.55, 360);
-    const delta = (card / maxX) * direction;
-    const nextProgress = Math.min(1, Math.max(0, currentProgress + delta));
-    const targetTop =
-      window.scrollY + rect.top + nextProgress * scrollable;
+    const rect = section.getBoundingClientRect();
+    const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
+    const delta = (step / maxX) * direction;
+    const next = Math.min(1, Math.max(0, progress + delta));
+    const targetTop = window.scrollY + rect.top + next * scrollable;
 
     window.scrollTo({ top: targetTop, behavior: "smooth" });
   }, []);
@@ -60,41 +69,42 @@ export function ServicesHorizontal({
     const track = trackRef.current;
     if (!section || !sticky || !track || services.length === 0) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const desktopMq = window.matchMedia("(min-width: 1024px)");
 
     let ctx: gsap.Context | null = null;
 
-    const setup = () => {
+    const teardown = () => {
       ctx?.revert();
       ctx = null;
       gsap.set(track, { clearProps: "transform" });
       section.style.height = "";
+    };
 
-      if (reduced || !desktopMq.matches) return;
+    const setup = () => {
+      teardown();
 
-      const getDistance = () =>
-        Math.max(0, track.scrollWidth - window.innerWidth + 80);
+      if (reduced.matches || !desktopMq.matches) return;
 
-      // Tall scroll runway; sticky panel stays fully on screen (no GSAP pin / DOM reparent)
-      const settle = window.innerHeight * 0.35;
-      section.style.height = `${window.innerHeight + getDistance() + settle}px`;
+      const travel = () =>
+        Math.max(0, track.scrollWidth - window.innerWidth + 72);
+
+      const distance = travel();
+      if (distance <= 0) return;
+
+      // Content-height sticky panel + long runway = slow swipe while scrolling down
+      section.style.height = `${sticky.offsetHeight + distance * SLOW_FACTOR}px`;
 
       ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.75,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            // Hold still until the full section is on screen, then swipe
-            const settleRatio = 0.16;
-            const p = Math.min(
-              1,
-              Math.max(0, (self.progress - settleRatio) / (1 - settleRatio)),
-            );
-            gsap.set(track, { x: -getDistance() * p });
+        gsap.to(track, {
+          x: () => -travel(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1.25,
+            invalidateOnRefresh: true,
           },
         });
       }, section);
@@ -107,15 +117,19 @@ export function ServicesHorizontal({
     const onResize = () => setup();
     window.addEventListener("resize", onResize);
     desktopMq.addEventListener("change", onResize);
-    const t = window.setTimeout(() => ScrollTrigger.refresh(), 400);
+    reduced.addEventListener("change", onResize);
+
+    const refreshTimer = window.setTimeout(() => {
+      setup();
+      ScrollTrigger.refresh();
+    }, 500);
 
     return () => {
-      window.clearTimeout(t);
+      window.clearTimeout(refreshTimer);
       window.removeEventListener("resize", onResize);
       desktopMq.removeEventListener("change", onResize);
-      ctx?.revert();
-      gsap.set(track, { clearProps: "transform" });
-      section.style.height = "";
+      reduced.removeEventListener("change", onResize);
+      teardown();
     };
   }, [services.length]);
 
@@ -124,11 +138,11 @@ export function ServicesHorizontal({
   return (
     <section
       ref={sectionRef}
-      className="section-dark relative overflow-x-clip bg-ikasa-black text-ikasa-white"
+      className="section-dark relative bg-ikasa-black text-ikasa-white"
     >
       <div
         ref={stickyRef}
-        className="film-grain relative flex flex-col justify-center gap-6 overflow-hidden py-16 lg:sticky lg:top-0 lg:h-svh lg:max-h-svh lg:gap-5 lg:py-8 xl:gap-6 xl:py-10"
+        className="relative flex flex-col gap-8 overflow-hidden py-16 sm:py-20 lg:sticky lg:top-0 lg:gap-9 lg:py-20"
       >
         <Container className="shrink-0">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
@@ -148,7 +162,8 @@ export function ServicesHorizontal({
 
             <div className="flex shrink-0 flex-col items-start gap-3 lg:items-end">
               <p className="font-label text-[0.62rem] tracking-[0.2em] text-ikasa-light-grey/80">
-                Swipe right — {String(services.length).padStart(2, "0")} services
+                Scroll down to explore —{" "}
+                {String(services.length).padStart(2, "0")} services
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -172,16 +187,21 @@ export function ServicesHorizontal({
           </div>
         </Container>
 
-        <div className="horizontal-swipe min-h-0 flex-1 overflow-x-auto overflow-y-hidden px-5 sm:px-6 lg:overflow-hidden lg:px-8">
+        <div
+          ref={scrollerRef}
+          data-lenis-prevent
+          className="horizontal-swipe min-h-0 overflow-x-auto overflow-y-hidden px-5 sm:px-6 lg:overflow-hidden lg:px-8"
+        >
           <div
             ref={trackRef}
-            className="flex h-full w-max snap-x snap-mandatory items-stretch gap-4 pb-1 will-change-transform lg:gap-5 lg:snap-none"
+            className="flex w-max snap-x snap-mandatory items-stretch gap-4 will-change-transform sm:gap-5 lg:snap-none"
           >
             {services.map((service, i) => (
               <Link
                 key={service._id}
+                data-service-card
                 href={`/services/${service.slug}`}
-                className="group relative flex h-[22rem] w-[min(82vw,18.5rem)] shrink-0 snap-start flex-col justify-end overflow-hidden border border-white/15 bg-ikasa-charcoal sm:h-[24rem] sm:w-[20rem] lg:h-full lg:max-h-[min(28rem,calc(100svh-13.5rem))] lg:min-h-[18rem] lg:w-[19.5rem] xl:w-[21rem]"
+                className="group relative flex h-[22rem] w-[min(82vw,18.5rem)] shrink-0 snap-start flex-col justify-end overflow-hidden border border-white/15 bg-ikasa-charcoal sm:h-[24rem] sm:w-[20rem] lg:h-[26rem] lg:w-[21rem]"
               >
                 <ImageWithFallback
                   src={service.listingImage}
@@ -212,7 +232,10 @@ export function ServicesHorizontal({
               </Link>
             ))}
 
-            <div className="flex h-[22rem] w-[min(82vw,18.5rem)] shrink-0 snap-start flex-col items-start justify-center gap-5 border border-white/10 bg-ikasa-charcoal/80 px-7 sm:h-[24rem] sm:w-[20rem] lg:h-full lg:max-h-[min(28rem,calc(100svh-13.5rem))] lg:min-h-[18rem] lg:w-[19.5rem]">
+            <div
+              data-service-card
+              className="flex h-[22rem] w-[min(82vw,18.5rem)] shrink-0 snap-start flex-col items-start justify-center gap-5 border border-white/10 bg-ikasa-charcoal/80 px-7 sm:h-[24rem] sm:w-[20rem] lg:h-[26rem] lg:w-[21rem]"
+            >
               <p className="max-w-[14rem] font-heading text-xl leading-tight tracking-tight text-ikasa-white sm:text-2xl">
                 Ready to explore every service?
               </p>

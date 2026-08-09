@@ -18,6 +18,11 @@ import {
   Testimonial,
 } from "@/models";
 
+/** Ensure Offer is registered for Service.relatedOffer populate (avoids tree-shake). */
+if (!Offer.modelName) {
+  throw new Error("Offer model failed to register");
+}
+
 function toPlainSettings(
   doc: Record<string, unknown> | null | undefined,
 ): PublicSiteSettings {
@@ -207,13 +212,21 @@ export type PublicServiceSummary = Awaited<
 export async function getServiceBySlug(slug: string) {
   try {
     await connectDB();
-    const service = await Service.findOne({ slug, published: true })
-      .populate(
-        "relatedServices",
-        "title slug serviceNumber listingImage shortDescription",
-      )
-      .populate("relatedOffer", "title description image")
-      .lean();
+
+    let service = null;
+    try {
+      service = await Service.findOne({ slug, published: true })
+        .populate(
+          "relatedServices",
+          "title slug serviceNumber listingImage shortDescription",
+        )
+        .populate("relatedOffer", "title description image")
+        .lean();
+    } catch {
+      // Populate can fail if a related schema isn't registered; still serve the page.
+      service = await Service.findOne({ slug, published: true }).lean();
+    }
+
     if (!service) return null;
     return {
       ...service,
