@@ -3,7 +3,7 @@
 import { Plus, Trash2, X } from "lucide-react";
 import { Input, Textarea } from "@/components/admin/FormField";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import type { UploadFolder } from "@/lib/uploads";
+import type { UploadFolder } from "@/lib/upload-urls";
 
 export function StringListEditor({
   label,
@@ -67,7 +67,7 @@ export function CardListEditor({
   onChange,
   nameKey = "title",
   nameLabel = "Title",
-  imageFolder = "services",
+  imageFolder = "misc",
   showOrder = false,
 }: {
   label: string;
@@ -170,7 +170,7 @@ export function ImageListEditor({
   label,
   values,
   onChange,
-  folder = "services",
+  folder = "misc",
 }: {
   label: string;
   values: string[];

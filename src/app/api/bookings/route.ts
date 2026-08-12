@@ -15,7 +15,7 @@ function parseOptionalDate(value?: string | null): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** Extracts booking fields from multipart form data, saving any attached photos to disk. */
+/** Extracts booking fields from multipart form data, saving photos to MongoDB storage. */
 async function readMultipartBody(
   formData: FormData,
 ): Promise<{ body: Record<string, unknown>; uploadedImages: string[] }> {
@@ -58,7 +58,7 @@ async function readMultipartBody(
 
   const uploadedImages: string[] = [...preUploaded];
   for (const file of files) {
-    const saved = await saveFile("bookings", file);
+    const saved = await saveFile("misc", file);
     uploadedImages.push(saved.url);
   }
 

@@ -41,3 +41,4 @@ export {
   type QuoteStatus,
 } from "./ProductQuoteRequest";
 export { SiteSettings, type SiteSettingsDocument } from "./SiteSettings";
+export { StoredUpload, type StoredUploadDocument } from "./StoredUpload";

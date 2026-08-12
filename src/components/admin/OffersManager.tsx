@@ -232,7 +232,7 @@ export function OffersManager({
           <Input label="Title" required value={form.title} onChange={(e) => patch({ title: e.target.value })} />
           <Textarea label="Description" value={form.description} onChange={(e) => patch({ description: e.target.value })} rows={3} />
           <Textarea label="Terms & conditions" value={form.terms} onChange={(e) => patch({ terms: e.target.value })} rows={2} />
-          <ImageUploader label="Image" value={form.image} onChange={(image) => patch({ image })} folder="offers" />
+          <ImageUploader label="Image" value={form.image} onChange={(image) => patch({ image })} folder="misc" />
           <Select
             label="Related service"
             value={form.relatedService}

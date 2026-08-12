@@ -224,7 +224,7 @@ export function ServiceForm({
             label="Listing image"
             value={form.listingImage}
             onChange={(url) => patch({ listingImage: url })}
-            folder="services"
+            folder="misc"
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
@@ -265,45 +265,45 @@ export function ServiceForm({
               label="Hero image"
               value={form.heroImage}
               onChange={(url) => patch({ heroImage: url })}
-              folder="services"
+              folder="misc"
             />
             <ImageUploader
               label="Overview image"
               value={form.overviewImage}
               onChange={(url) => patch({ overviewImage: url })}
-              folder="services"
+              folder="misc"
             />
             <ImageUploader
               label="Process image"
               value={form.processImage}
               onChange={(url) => patch({ processImage: url })}
-              folder="services"
+              folder="misc"
             />
             <ImageUploader
               label="Feature image"
               value={form.featureImage}
               onChange={(url) => patch({ featureImage: url })}
-              folder="services"
+              folder="misc"
             />
           </div>
           <ImageListEditor
             label="Gallery images"
             values={form.galleryImages}
             onChange={(galleryImages) => patch({ galleryImages })}
-            folder="services"
+            folder="misc"
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <ImageUploader
               label="Before image"
               value={form.beforeImage}
               onChange={(url) => patch({ beforeImage: url })}
-              folder="services"
+              folder="misc"
             />
             <ImageUploader
               label="After image"
               value={form.afterImage}
               onChange={(url) => patch({ afterImage: url })}
-              folder="services"
+              folder="misc"
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

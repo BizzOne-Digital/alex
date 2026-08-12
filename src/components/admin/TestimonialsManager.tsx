@@ -259,7 +259,7 @@ export function TestimonialsManager({
             options={serviceOptions.map((s) => ({ value: s.id, label: s.title }))}
             placeholder="None"
           />
-          <ImageUploader label="Photo" value={form.image} onChange={(image) => patch({ image })} folder="testimonials" aspect="square" />
+          <ImageUploader label="Photo" value={form.image} onChange={(image) => patch({ image })} folder="misc" aspect="square" />
           <div className="grid grid-cols-2 gap-4">
             <Toggle label="Featured" checked={form.featured} onChange={(featured) => patch({ featured })} />
             <Toggle label="Published" checked={form.published} onChange={(published) => patch({ published })} />

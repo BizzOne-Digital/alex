@@ -2,6 +2,7 @@
 
 import Image, { type ImageProps } from "next/image";
 import { useState } from "react";
+import { normalizeImageSrc } from "@/lib/upload-urls";
 import { cn } from "@/lib/utils";
 
 type ImageWithFallbackProps = Omit<ImageProps, "src" | "alt"> & {
@@ -20,7 +21,8 @@ export function ImageWithFallback({
   ...rest
 }: ImageWithFallbackProps) {
   const [failed, setFailed] = useState(false);
-  const hasSrc = Boolean(src && !failed);
+  const normalized = normalizeImageSrc(src);
+  const hasSrc = Boolean(normalized && !failed);
 
   if (!hasSrc && !fallbackSrc) {
     return (
@@ -52,7 +54,7 @@ export function ImageWithFallback({
     );
   }
 
-  const resolved = hasSrc ? (src as string) : (fallbackSrc as string);
+  const resolved = hasSrc ? (normalized as string) : (fallbackSrc as string);
 
   return (
     <Image
@@ -60,6 +62,7 @@ export function ImageWithFallback({
       alt={alt}
       className={cn(className, !hasSrc && fallbackClassName)}
       onError={() => setFailed(true)}
+      unoptimized={resolved.startsWith("/api/uploads/")}
       {...rest}
     />
   );

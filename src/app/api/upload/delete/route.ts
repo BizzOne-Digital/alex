@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
-import { deleteFile } from "@/lib/uploads";
+import { deleteStoredUpload, isStoredUploadUrl } from "@/lib/uploads";
+
+export const runtime = "nodejs";
 
 export async function DELETE(request: Request) {
   try {
@@ -17,22 +19,19 @@ export async function DELETE(request: Request) {
     const url = body?.url || searchParams.get("url");
 
     if (!url || typeof url !== "string") {
-      return NextResponse.json(
-        { error: "Missing url" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing url" }, { status: 400 });
     }
 
-    await deleteFile(url);
+    if (!isStoredUploadUrl(url)) {
+      return NextResponse.json({ ok: true, skipped: true });
+    }
+
+    await deleteStoredUpload(url);
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Delete failed";
-    const status =
-      message.includes("Invalid") || message.includes("traversal")
-        ? 400
-        : 500;
     console.error("Upload delete error:", error);
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

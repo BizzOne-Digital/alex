@@ -1,29 +1,32 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { randomBytes } from "crypto";
+import { connectDB } from "@/lib/db";
+import {
+  assertUploadFolder,
+  MAX_UPLOAD_BYTES,
+  parseStoredUploadUrl,
+  storedUploadPublicUrl,
+  UPLOAD_FOLDERS,
+  type UploadFolder,
+} from "@/lib/upload-urls";
+import { StoredUpload } from "@/models/StoredUpload";
 
-export const UPLOAD_FOLDERS = [
-  "pages",
-  "services",
-  "gallery",
-  "testimonials",
-  "products",
-  "offers",
-  "bookings",
-  "settings",
-  "inquiries",
-] as const;
-
-export type UploadFolder = (typeof UPLOAD_FOLDERS)[number];
-
-const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+export {
+  MAX_UPLOAD_BYTES,
+  UPLOAD_FOLDERS,
+  type UploadFolder,
+  assertUploadFolder,
+  isStoredUploadUrl,
+  isLegacyDiskUploadUrl,
+  parseStoredUploadUrl,
+  storedUploadPublicUrl,
+  normalizeImageSrc,
+} from "@/lib/upload-urls";
 
 const MIME_TO_EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/avif": ".avif",
-  "image/svg+xml": ".svg",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
 };
 
 const EXT_TO_MIME: Record<string, string> = {
@@ -31,47 +34,8 @@ const EXT_TO_MIME: Record<string, string> = {
   ".jpeg": "image/jpeg",
   ".png": "image/png",
   ".webp": "image/webp",
-  ".avif": "image/avif",
-  ".svg": "image/svg+xml",
+  ".gif": "image/gif",
 };
-
-function isUploadFolder(value: string): value is UploadFolder {
-  return (UPLOAD_FOLDERS as readonly string[]).includes(value);
-}
-
-export function assertUploadFolder(folder: string): UploadFolder {
-  if (!isUploadFolder(folder)) {
-    throw new Error(
-      `Invalid upload folder. Allowed: ${UPLOAD_FOLDERS.join(", ")}`,
-    );
-  }
-  return folder;
-}
-
-function getUploadsRoot(): string {
-  return path.join(process.cwd(), "public", "uploads");
-}
-
-export function getAbsolutePath(relativeUrl: string): string {
-  if (!relativeUrl.startsWith("/uploads/")) {
-    throw new Error("Invalid upload path");
-  }
-
-  const relative = relativeUrl.replace(/^\/+/, "");
-  const absolute = path.resolve(process.cwd(), "public", relative);
-  const root = path.resolve(getUploadsRoot());
-
-  if (!absolute.startsWith(root + path.sep) && absolute !== root) {
-    throw new Error("Path traversal detected");
-  }
-
-  return absolute;
-}
-
-function sanitizeFilename(name: string): string {
-  const base = path.basename(name).replace(/[^a-zA-Z0-9._-]/g, "_");
-  return base.slice(0, 120) || "file";
-}
 
 function detectImageMime(buffer: Buffer): string | null {
   if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
@@ -93,58 +57,32 @@ function detectImageMime(buffer: Buffer): string | null {
   ) {
     return "image/webp";
   }
-  // AVIF / HEIF brand in ftyp box
-  if (
-    buffer.length >= 12 &&
-    buffer.toString("ascii", 4, 8) === "ftyp"
-  ) {
-    const brand = buffer.toString("ascii", 8, 12);
-    if (brand === "avif" || brand === "avis" || brand === "mif1") {
-      return "image/avif";
-    }
-  }
-  // Basic SVG check (text-based)
-  const head = buffer.subarray(0, Math.min(buffer.length, 256)).toString("utf8").trimStart();
-  if (head.startsWith("<svg") || head.startsWith("<?xml")) {
-    if (/<svg[\s>]/i.test(head) || buffer.toString("utf8").includes("<svg")) {
-      return "image/svg+xml";
-    }
+  if (buffer.length >= 6 && buffer.toString("ascii", 0, 3) === "GIF") {
+    return "image/gif";
   }
   return null;
 }
 
-function validateFile(
-  folder: UploadFolder,
+function validateImageFile(
   file: File,
   buffer: Buffer,
 ): { mime: string; ext: string } {
-  if (file.size > MAX_FILE_SIZE || buffer.length > MAX_FILE_SIZE) {
+  if (file.size > MAX_UPLOAD_BYTES || buffer.length > MAX_UPLOAD_BYTES) {
     throw new Error("File exceeds maximum size of 8MB");
   }
 
-  const declaredMime = (file.type || "").toLowerCase();
-  const originalExt = path.extname(file.name || "").toLowerCase();
   const magicMime = detectImageMime(buffer);
-
   if (!magicMime) {
     throw new Error("Unrecognized or unsupported image file");
   }
 
-  const allowSvg = folder === "settings";
-  if (magicMime === "image/svg+xml" && !allowSvg) {
-    throw new Error("SVG uploads are only allowed for settings/brand assets");
-  }
-
-  const allowedMimes = allowSvg
-    ? Object.keys(MIME_TO_EXT)
-    : Object.keys(MIME_TO_EXT).filter((m) => m !== "image/svg+xml");
-
+  const allowedMimes = Object.keys(MIME_TO_EXT);
   if (!allowedMimes.includes(magicMime)) {
-    throw new Error("Unsupported image type");
+    throw new Error("Unsupported image type. Allowed: JPEG, PNG, WebP, GIF");
   }
 
-  if (declaredMime && declaredMime !== magicMime) {
-    // Allow jpeg/jpg alias mismatch; otherwise reject MIME spoofing
+  const declaredMime = (file.type || "").toLowerCase();
+  if (declaredMime) {
     const declaredNormalized =
       declaredMime === "image/jpg" ? "image/jpeg" : declaredMime;
     if (declaredNormalized !== magicMime) {
@@ -152,6 +90,9 @@ function validateFile(
     }
   }
 
+  const originalExt = file.name.includes(".")
+    ? `.${file.name.split(".").pop()?.toLowerCase()}`
+    : "";
   if (originalExt) {
     const expectedFromExt = EXT_TO_MIME[originalExt];
     if (!expectedFromExt) {
@@ -170,46 +111,68 @@ function validateFile(
   return { mime: magicMime, ext };
 }
 
-export async function saveFile(
+function uniqueFilename(ext: string): string {
+  return `${Date.now()}-${randomBytes(8).toString("hex")}.${ext}`;
+}
+
+export type SaveUploadResult = {
+  url: string;
+  filename: string;
+  folder: UploadFolder;
+  mime: string;
+  size: number;
+};
+
+export async function saveStoredUpload(
   folder: string,
   file: File,
-): Promise<{ url: string; mime: string; size: number }> {
+): Promise<SaveUploadResult> {
   const safeFolder = assertUploadFolder(folder);
   const buffer = Buffer.from(await file.arrayBuffer());
-  const { mime, ext } = validateFile(safeFolder, file, buffer);
+  const { mime, ext } = validateImageFile(file, buffer);
+  const filename = uniqueFilename(ext);
 
-  const stem = sanitizeFilename(
-    path.parse(file.name || "upload").name,
-  ).slice(0, 40);
-  const uniqueName = `${stem}-${uuidv4()}${ext}`;
-
-  const dir = path.join(getUploadsRoot(), safeFolder);
-  await fs.mkdir(dir, { recursive: true });
-
-  const absolute = path.join(dir, uniqueName);
-  const root = path.resolve(getUploadsRoot());
-  if (!absolute.startsWith(root + path.sep)) {
-    throw new Error("Path traversal detected");
-  }
-
-  await fs.writeFile(absolute, buffer);
+  await connectDB();
+  await StoredUpload.create({
+    folder: safeFolder,
+    filename,
+    mimeType: mime,
+    size: buffer.length,
+    data: buffer,
+  });
 
   return {
-    url: `/uploads/${safeFolder}/${uniqueName}`,
+    url: storedUploadPublicUrl(safeFolder, filename),
+    filename,
+    folder: safeFolder,
     mime,
     size: buffer.length,
   };
 }
 
+export async function deleteStoredUpload(url: string): Promise<void> {
+  const parsed = parseStoredUploadUrl(url);
+  if (!parsed) return;
+
+  await connectDB();
+  await StoredUpload.deleteOne({
+    folder: parsed.folder,
+    filename: parsed.filename,
+  });
+}
+
+/** @deprecated Use saveStoredUpload. */
+export async function saveFile(
+  folder: string,
+  file: File,
+): Promise<{ url: string; mime: string; size: number }> {
+  const result = await saveStoredUpload(folder, file);
+  return { url: result.url, mime: result.mime, size: result.size };
+}
+
+/** @deprecated Use deleteStoredUpload. */
 export async function deleteFile(relativeUrl: string): Promise<void> {
-  const absolute = getAbsolutePath(relativeUrl);
-  try {
-    await fs.unlink(absolute);
-  } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ENOENT") {
-      return;
-    }
-    throw error;
+  if (parseStoredUploadUrl(relativeUrl)) {
+    await deleteStoredUpload(relativeUrl);
   }
 }

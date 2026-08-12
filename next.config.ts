@@ -9,8 +9,14 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-    // Local files under /public/uploads are served as static assets;
-    // no remotePatterns entry needed for `/uploads/...` paths.
+    localPatterns: [
+      {
+        pathname: "/api/uploads/**",
+      },
+      {
+        pathname: "/brand/**",
+      },
+    ],
   },
 };
 

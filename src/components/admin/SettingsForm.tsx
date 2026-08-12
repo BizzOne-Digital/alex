@@ -131,9 +131,9 @@ export function SettingsForm({ initial }: { initial: SettingsFormValues }) {
 
       <Section title="Branding">
         <div className="grid gap-4 sm:grid-cols-3">
-          <ImageUploader label="Header logo" value={form.headerLogo} onChange={(headerLogo) => saveBranding({ headerLogo })} folder="settings" aspect="square" />
-          <ImageUploader label="Footer logo" value={form.footerLogo} onChange={(footerLogo) => saveBranding({ footerLogo })} folder="settings" aspect="square" />
-          <ImageUploader label="Favicon" value={form.favicon} onChange={(favicon) => saveBranding({ favicon })} folder="settings" aspect="square" />
+          <ImageUploader label="Header logo" value={form.headerLogo} onChange={(headerLogo) => saveBranding({ headerLogo })} folder="misc" aspect="square" />
+          <ImageUploader label="Footer logo" value={form.footerLogo} onChange={(footerLogo) => saveBranding({ footerLogo })} folder="misc" aspect="square" />
+          <ImageUploader label="Favicon" value={form.favicon} onChange={(favicon) => saveBranding({ favicon })} folder="misc" aspect="square" />
         </div>
       </Section>
 
