@@ -23,6 +23,26 @@ if (!Offer.modelName) {
   throw new Error("Offer model failed to register");
 }
 
+const LEGACY_BRAND_PATHS = new Set([
+  "/brand/ikasa-logo-light.svg",
+  "/brand/ikasa-logo.svg",
+  "/brand/ikasa-mark.svg",
+  "/brand/ikasa-favicon.svg",
+]);
+
+function resolveBrandAsset(
+  value: unknown,
+  fallback: string,
+): string {
+  const path = String(value ?? "").trim();
+  if (!path || LEGACY_BRAND_PATHS.has(path)) return fallback;
+  return path;
+}
+
+function logDataError(fn: string, error: unknown): void {
+  console.error(`[data:${fn}]`, error);
+}
+
 function toPlainSettings(
   doc: Record<string, unknown> | null | undefined,
 ): PublicSiteSettings {
@@ -47,9 +67,15 @@ function toPlainSettings(
     facebookUrl: String(d.facebookUrl ?? DEFAULT_SITE_SETTINGS.facebookUrl),
     tiktokUrl: String(d.tiktokUrl ?? DEFAULT_SITE_SETTINGS.tiktokUrl),
     youtubeUrl: String(d.youtubeUrl ?? DEFAULT_SITE_SETTINGS.youtubeUrl),
-    headerLogo: String(d.headerLogo || DEFAULT_SITE_SETTINGS.headerLogo),
-    footerLogo: String(d.footerLogo || DEFAULT_SITE_SETTINGS.footerLogo),
-    favicon: String(d.favicon || DEFAULT_SITE_SETTINGS.favicon),
+    headerLogo: resolveBrandAsset(
+      d.headerLogo,
+      DEFAULT_SITE_SETTINGS.headerLogo,
+    ),
+    footerLogo: resolveBrandAsset(
+      d.footerLogo,
+      DEFAULT_SITE_SETTINGS.footerLogo,
+    ),
+    favicon: resolveBrandAsset(d.favicon, DEFAULT_SITE_SETTINGS.favicon),
     headerCtaLabel: String(
       d.headerCtaLabel || DEFAULT_SITE_SETTINGS.headerCtaLabel,
     ),
@@ -89,7 +115,8 @@ export async function getSettings(): Promise<PublicSiteSettings> {
     await connectDB();
     const doc = await SiteSettings.findOne({ key: "site" }).lean();
     return toPlainSettings(doc as Record<string, unknown> | null);
-  } catch {
+  } catch (error) {
+    logDataError("getSettings", error);
     return toPlainSettings(null);
   }
 }
@@ -109,7 +136,8 @@ export async function getPublishedServices(): Promise<PublicServiceNavItem[]> {
       serviceNumber: s.serviceNumber ?? "",
       shortDescription: s.shortDescription ?? "",
     }));
-  } catch {
+  } catch (error) {
+    logDataError("getPublishedServices", error);
     return [];
   }
 }
@@ -127,7 +155,8 @@ export async function getPageBySlug(slug: string) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map((s) => ({ ...s, _id: String(s._id) })),
     };
-  } catch {
+  } catch (error) {
+    logDataError(`getPageBySlug(${slug})`, error);
     return null;
   }
 }

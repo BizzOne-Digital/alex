@@ -27,7 +27,12 @@ export function PageMetaForm({
     setSaving(true);
     try {
       const result = await updatePageMeta(slug, form);
-      toast(result.ok ? "Page settings saved" : result.error, result.ok ? "success" : "error");
+      toast(
+        result.ok
+          ? "Page settings saved. Refresh the public site if you changed publish status."
+          : result.error,
+        result.ok ? "success" : "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -35,8 +40,13 @@ export function PageMetaForm({
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 bg-neutral-900/40 p-5">
-      <div className="flex items-center justify-between">
-        <h3 className="font-heading text-sm text-neutral-100">Page Settings</h3>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-heading text-sm text-neutral-100">Page Settings (SEO only)</h3>
+          <p className="mt-1 text-xs text-neutral-500">
+            Browser tab title and meta description. Does not change visible headlines.
+          </p>
+        </div>
         <Toggle
           label="Published"
           checked={form.published}
@@ -44,6 +54,12 @@ export function PageMetaForm({
           className="w-auto border-none bg-transparent p-0"
         />
       </div>
+      {!form.published ? (
+        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          This page is unpublished. The public site will keep showing default content until
+          Published is turned on and you save page settings.
+        </p>
+      ) : null}
       <Input
         label="Page title"
         value={form.title}

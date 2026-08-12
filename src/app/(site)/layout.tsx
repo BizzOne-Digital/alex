@@ -1,6 +1,8 @@
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getPublishedServices, getSettings } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function SiteLayout({
   children,
 }: {

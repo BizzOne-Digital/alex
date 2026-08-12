@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, GripVertical, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 import { Input, Textarea } from "@/components/admin/FormField";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { savePageSection } from "@/actions/admin/pages";
 import type { PlainSection } from "@/actions/admin/pages";
 import type { SectionDefinition } from "@/lib/admin/page-sections";
 
@@ -38,6 +37,26 @@ type SectionFormState = {
   items: SectionItem[];
   visible: boolean;
 };
+
+async function saveSectionViaApi(
+  pageSlug: string,
+  sectionKey: string,
+  data: SectionFormState,
+): Promise<{ ok: boolean; error?: string }> {
+  const res = await fetch(
+    `/api/admin/pages/${encodeURIComponent(pageSlug)}/sections/${encodeURIComponent(sectionKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    },
+  );
+  const json = (await res.json()) as { ok?: boolean; error?: string };
+  if (!res.ok || !json.ok) {
+    return { ok: false, error: json.error || "Unable to save section" };
+  }
+  return { ok: true };
+}
 
 function toFormState(section: PlainSection | undefined): SectionFormState {
   return {
@@ -233,35 +252,83 @@ function SectionAccordionItem({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<SectionFormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const formRef = useRef(form);
+  formRef.current = form;
   const { toast } = useToast();
 
   const fields = new Set(definition.fields);
 
-  const patch = (partial: Partial<SectionFormState>) => setForm((prev) => ({ ...prev, ...partial }));
+  const patch = (partial: Partial<SectionFormState>) => {
+    setDirty(true);
+    setForm((prev) => ({ ...prev, ...partial }));
+  };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const result = await savePageSection(pageSlug, definition.key, form);
-      if (result.ok) {
-        toast(`${definition.label} saved`, "success");
-      } else {
-        toast(result.error, "error");
+  const saveNow = useCallback(
+    async (quiet = false) => {
+      const payload = formRef.current;
+      setSaving(true);
+      try {
+        const result = await saveSectionViaApi(pageSlug, definition.key, payload);
+        if (result.ok) {
+          setDirty(false);
+          if (!quiet) {
+            toast(
+              `${definition.label} saved to database. Refresh the public site to preview.`,
+              "success",
+            );
+          }
+        } else {
+          toast(result.error || "Unable to save section", "error");
+        }
+        return result.ok;
+      } catch {
+        toast("Unable to save section", "error");
+        return false;
+      } finally {
+        setSaving(false);
       }
-    } catch {
-      toast("Unable to save section", "error");
-    } finally {
-      setSaving(false);
-    }
+    },
+    [definition.key, definition.label, pageSlug, toast],
+  );
+
+  const handleSave = () => {
+    void saveNow(false);
+  };
+
+  const handleBlurSave = () => {
+    if (dirty) void saveNow(true);
+  };
+
+  const patchImage = (partial: Partial<SectionFormState>) => {
+    const next = { ...formRef.current, ...partial };
+    setForm(next);
+    formRef.current = next;
+    setDirty(true);
+    void saveNow(true);
   };
 
   const handleVisibleToggle = async (visible: boolean) => {
-    patch({ visible });
-    const result = await savePageSection(pageSlug, definition.key, { ...form, visible });
-    if (result.ok) {
-      toast(visible ? `${definition.label} shown` : `${definition.label} hidden`, "success");
-    } else {
-      toast(result.error, "error");
+    const next = { ...formRef.current, visible };
+    setForm(next);
+    formRef.current = next;
+    setDirty(true);
+    setSaving(true);
+    try {
+      const result = await saveSectionViaApi(pageSlug, definition.key, next);
+      if (result.ok) {
+        setDirty(false);
+        toast(
+          visible
+            ? `${definition.label} is now visible on the public site.`
+            : `${definition.label} is now hidden from the public site.`,
+          "success",
+        );
+      } else {
+        toast(result.error || "Unable to update visibility", "error");
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -315,16 +382,17 @@ function SectionAccordionItem({
           >
             <div className="flex flex-col gap-4 border-t border-neutral-800 px-4 py-4">
               {fields.has("eyebrow") && (
-                <Input label="Eyebrow" value={form.eyebrow} onChange={(e) => patch({ eyebrow: e.target.value })} />
+                <Input label="Eyebrow" value={form.eyebrow} onChange={(e) => patch({ eyebrow: e.target.value })} onBlur={handleBlurSave} />
               )}
               {fields.has("heading") && (
-                <Input label="Heading" value={form.heading} onChange={(e) => patch({ heading: e.target.value })} />
+                <Input label="Heading" value={form.heading} onChange={(e) => patch({ heading: e.target.value })} onBlur={handleBlurSave} />
               )}
               {fields.has("subheading") && (
                 <Input
                   label="Subheading"
                   value={form.subheading}
                   onChange={(e) => patch({ subheading: e.target.value })}
+                  onBlur={handleBlurSave}
                 />
               )}
               {fields.has("content") && (
@@ -332,6 +400,7 @@ function SectionAccordionItem({
                   label="Content"
                   value={form.content}
                   onChange={(e) => patch({ content: e.target.value })}
+                  onBlur={handleBlurSave}
                   rows={4}
                 />
               )}
@@ -350,11 +419,13 @@ function SectionAccordionItem({
                     label="Primary CTA label"
                     value={form.ctaLabel}
                     onChange={(e) => patch({ ctaLabel: e.target.value })}
+                    onBlur={handleBlurSave}
                   />
                   <Input
                     label="Primary CTA link"
                     value={form.ctaLink}
                     onChange={(e) => patch({ ctaLink: e.target.value })}
+                    onBlur={handleBlurSave}
                     placeholder="/booking"
                   />
                 </div>
@@ -365,11 +436,13 @@ function SectionAccordionItem({
                     label="Secondary CTA label"
                     value={form.ctaSecondaryLabel}
                     onChange={(e) => patch({ ctaSecondaryLabel: e.target.value })}
+                    onBlur={handleBlurSave}
                   />
                   <Input
                     label="Secondary CTA link"
                     value={form.ctaSecondaryLink}
                     onChange={(e) => patch({ ctaSecondaryLink: e.target.value })}
+                    onBlur={handleBlurSave}
                     placeholder="/contact"
                   />
                 </div>
@@ -380,6 +453,7 @@ function SectionAccordionItem({
                   label="Image alt text"
                   value={form.imageAlt}
                   onChange={(e) => patch({ imageAlt: e.target.value })}
+                  onBlur={handleBlurSave}
                   hint="Describe the image for accessibility and SEO."
                 />
               )}
@@ -389,7 +463,7 @@ function SectionAccordionItem({
                   <ImageUploader
                     label="Primary image"
                     value={form.primaryImage}
-                    onChange={(url) => patch({ primaryImage: url })}
+                    onChange={(url) => patchImage({ primaryImage: url })}
                     folder="pages"
                   />
                 )}
@@ -397,7 +471,7 @@ function SectionAccordionItem({
                   <ImageUploader
                     label="Secondary image"
                     value={form.secondaryImage}
-                    onChange={(url) => patch({ secondaryImage: url })}
+                    onChange={(url) => patchImage({ secondaryImage: url })}
                     folder="pages"
                   />
                 )}
@@ -405,7 +479,7 @@ function SectionAccordionItem({
                   <ImageUploader
                     label="Background image"
                     value={form.backgroundImage}
-                    onChange={(url) => patch({ backgroundImage: url })}
+                    onChange={(url) => patchImage({ backgroundImage: url })}
                     folder="pages"
                   />
                 )}
@@ -413,7 +487,7 @@ function SectionAccordionItem({
                   <ImageUploader
                     label="Before image"
                     value={form.beforeImage}
-                    onChange={(url) => patch({ beforeImage: url })}
+                    onChange={(url) => patchImage({ beforeImage: url })}
                     folder="pages"
                   />
                 )}
@@ -421,7 +495,7 @@ function SectionAccordionItem({
                   <ImageUploader
                     label="After image"
                     value={form.afterImage}
-                    onChange={(url) => patch({ afterImage: url })}
+                    onChange={(url) => patchImage({ afterImage: url })}
                     folder="pages"
                   />
                 )}
@@ -435,7 +509,14 @@ function SectionAccordionItem({
                 />
               )}
 
-              <div className="flex justify-end border-t border-neutral-800 pt-4">
+              <div className="flex items-center justify-between border-t border-neutral-800 pt-4">
+                <p className="text-xs text-neutral-500">
+                  {saving
+                    ? "Saving to database…"
+                    : dirty
+                      ? "Unsaved changes — click Save section or tab out of a field."
+                      : "Saved to database."}
+                </p>
                 <button
                   type="button"
                   onClick={handleSave}

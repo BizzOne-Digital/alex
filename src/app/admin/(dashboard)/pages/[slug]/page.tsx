@@ -38,9 +38,20 @@ export default async function AdminPageEditorPage({
         </Link>
         <h2 className="font-heading text-xl text-neutral-100">{definition.title} Page</h2>
         <p className="text-sm text-neutral-500">
-          Update each section independently. Toggle visibility without deleting content.
+          Update each section independently. Text changes need &quot;Save section&quot;. Images
+          save automatically after upload.
         </p>
       </div>
+
+      <div className="rounded-lg border border-red-600/30 bg-red-600/10 px-4 py-3">
+        <p className="text-sm font-medium text-neutral-100">Edit visible page content here</p>
+        <p className="mt-1 text-xs text-neutral-400">
+          Open a section below, change heading/content, then click{" "}
+          <strong className="text-neutral-200">Save section</strong> or tab out of the field.
+        </p>
+      </div>
+
+      <SectionEditor pageSlug={slug} definitions={definition.sections} sections={page.sections} />
 
       <PageMetaForm
         slug={slug}
@@ -49,8 +60,6 @@ export default async function AdminPageEditorPage({
         seoDescription={page.seoDescription}
         published={page.published}
       />
-
-      <SectionEditor pageSlug={slug} definitions={definition.sections} sections={page.sections} />
     </div>
   );
 }

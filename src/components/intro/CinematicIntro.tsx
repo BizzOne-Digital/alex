@@ -8,6 +8,7 @@ const INTRO_MS = 3800;
 
 type CinematicIntroProps = {
   enabled?: boolean;
+  tagline?: string;
 };
 
 function subscribeIntro() {
@@ -26,7 +27,7 @@ function getIntroSeenServer() {
   return true;
 }
 
-export function CinematicIntro({ enabled = true }: CinematicIntroProps) {
+export function CinematicIntro({ enabled = true, tagline }: CinematicIntroProps) {
   const reduced = useReducedMotion();
   const seen = useSyncExternalStore(
     subscribeIntro,
@@ -248,7 +249,7 @@ export function CinematicIntro({ enabled = true }: CinematicIntroProps) {
               }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              From Outdated to Outstanding
+              {tagline || "From Outdated to Outstanding"}
             </motion.p>
 
             <motion.div

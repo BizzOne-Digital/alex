@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, Save } from "lucide-react";
 import { Input, Textarea } from "@/components/admin/FormField";
 import { ImageUploader } from "@/components/admin/ImageUploader";
@@ -47,20 +48,45 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function SettingsForm({ initial }: { initial: SettingsFormValues }) {
+  const router = useRouter();
   const [form, setForm] = useState<SettingsFormValues>(initial);
   const [saving, setSaving] = useState(false);
+  const savedSnapshot = useRef(JSON.stringify(initial));
   const { toast } = useToast();
 
-  const patch = (partial: Partial<SettingsFormValues>) => setForm((prev) => ({ ...prev, ...partial }));
+  const patch = (partial: Partial<SettingsFormValues>) =>
+    setForm((prev) => ({ ...prev, ...partial }));
 
-  const handleSave = async () => {
+  const persist = async (next: SettingsFormValues, quiet = false) => {
+    const snapshot = JSON.stringify(next);
+    if (snapshot === savedSnapshot.current) return true;
+
     setSaving(true);
     try {
-      const result = await updateSiteSettings(form);
-      toast(result.ok ? "Settings saved" : result.error, result.ok ? "success" : "error");
+      const result = await updateSiteSettings(next);
+      if (result.ok) {
+        savedSnapshot.current = snapshot;
+        router.refresh();
+        if (!quiet) {
+          toast("Settings saved. Refresh the public site to view changes.", "success");
+        }
+      } else {
+        toast(result.error, "error");
+      }
+      return result.ok;
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async () => {
+    await persist(form, false);
+  };
+
+  const saveBranding = async (partial: Partial<SettingsFormValues>) => {
+    const next = { ...form, ...partial };
+    setForm(next);
+    await persist(next, false);
   };
 
   return (
@@ -105,9 +131,9 @@ export function SettingsForm({ initial }: { initial: SettingsFormValues }) {
 
       <Section title="Branding">
         <div className="grid gap-4 sm:grid-cols-3">
-          <ImageUploader label="Header logo" value={form.headerLogo} onChange={(headerLogo) => patch({ headerLogo })} folder="settings" aspect="square" />
-          <ImageUploader label="Footer logo" value={form.footerLogo} onChange={(footerLogo) => patch({ footerLogo })} folder="settings" aspect="square" />
-          <ImageUploader label="Favicon" value={form.favicon} onChange={(favicon) => patch({ favicon })} folder="settings" aspect="square" />
+          <ImageUploader label="Header logo" value={form.headerLogo} onChange={(headerLogo) => saveBranding({ headerLogo })} folder="settings" aspect="square" />
+          <ImageUploader label="Footer logo" value={form.footerLogo} onChange={(footerLogo) => saveBranding({ footerLogo })} folder="settings" aspect="square" />
+          <ImageUploader label="Favicon" value={form.favicon} onChange={(favicon) => saveBranding({ favicon })} folder="settings" aspect="square" />
         </div>
       </Section>
 

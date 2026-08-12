@@ -1,13 +1,13 @@
 "use server";
 
 import { connectDB } from "@/lib/db";
+import { persistPageSection } from "@/lib/admin/persist-page-section";
 import { Page } from "@/models";
 import { assertAdmin, actionError, type ActionResult } from "@/lib/admin/guard";
 import { serializeDoc } from "@/lib/admin/serialize";
 import { revalidatePageSlug } from "@/lib/revalidate";
 import {
   pageMetaSchema,
-  pageSectionSchema,
   type sectionItemSchema,
 } from "@/lib/validations/admin";
 import { getPageDefinition, isKnownPageSlug, PAGE_DEFINITIONS } from "@/lib/admin/page-sections";
@@ -141,29 +141,22 @@ export async function savePageSection(
 ): Promise<ActionResult> {
   try {
     await assertAdmin();
-    const parsed = pageSectionSchema.safeParse({ ...(input as object), key: sectionKey });
-    if (!parsed.success) {
-      return { ok: false, error: "Validation failed", fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]> };
+    const result = await persistPageSection(slug, sectionKey, input);
+    if (!result.ok) {
+      if (result.fieldErrors) {
+        console.error("[savePageSection] validation failed", result.fieldErrors);
+      }
+      return {
+        ok: false,
+        error: result.error,
+        fieldErrors: result.fieldErrors,
+      };
     }
 
-    await connectDB();
-    const page = await Page.findOne({ slug });
-    if (!page) return { ok: false, error: "Page not found" };
-
-    const index = page.sections.findIndex((s) => s.key === sectionKey);
-    const definition = getPageDefinition(slug);
-    const order = definition?.sections.findIndex((s) => s.key === sectionKey) ?? 0;
-
-    if (index >= 0) {
-      page.sections[index].set({ ...parsed.data, order });
-    } else {
-      page.sections.push({ ...parsed.data, order } as never);
-    }
-
-    await page.save();
     revalidatePageSlug(slug);
     return { ok: true, data: undefined };
   } catch (error) {
+    console.error("[savePageSection]", slug, sectionKey, error);
     return actionError(error, "Unable to save section");
   }
 }

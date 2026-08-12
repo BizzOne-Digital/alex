@@ -18,9 +18,15 @@ const PAGE_SLUG_TO_PATH: Record<string, string> = {
   contact: "/contact",
 };
 
+/** Header, footer, and shared shell read settings on every public request. */
+function revalidatePublicLayout(): void {
+  revalidatePath("/", "layout");
+}
+
 export function revalidatePageSlug(slug: string): void {
   const path = PAGE_SLUG_TO_PATH[slug];
   revalidatePath(path ?? "/");
+  revalidatePublicLayout();
   revalidatePath("/admin/pages");
   revalidatePath(`/admin/pages/${slug}`);
 }
@@ -29,6 +35,7 @@ export function revalidateServices(slug?: string | null): void {
   revalidatePath("/");
   revalidatePath("/services");
   if (slug) revalidatePath(`/services/${slug}`);
+  revalidatePublicLayout();
   revalidatePath("/admin/services");
 }
 
@@ -36,30 +43,34 @@ export function revalidateGallery(categorySlug?: string | null): void {
   revalidatePath("/");
   revalidatePath("/gallery");
   if (categorySlug) revalidatePath(`/gallery/${categorySlug}`);
+  revalidatePublicLayout();
   revalidatePath("/admin/gallery");
 }
 
 export function revalidateTestimonials(): void {
   revalidatePath("/");
   revalidatePath("/testimonials");
+  revalidatePublicLayout();
   revalidatePath("/admin/testimonials");
 }
 
 export function revalidateFaqs(): void {
   revalidatePath("/");
   revalidatePath("/faq");
+  revalidatePublicLayout();
   revalidatePath("/admin/faqs");
 }
 
 export function revalidateOffers(): void {
   revalidatePath("/");
   revalidatePath("/offers");
+  revalidatePublicLayout();
   revalidatePath("/admin/offers");
 }
 
 /** Settings affect header/footer/SEO defaults across the entire public site. */
 export function revalidateSettings(): void {
-  revalidatePath("/", "layout");
+  revalidatePublicLayout();
   revalidatePath("/admin/settings");
 }
 

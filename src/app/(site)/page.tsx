@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CinematicIntro } from "@/components/intro/CinematicIntro";
 import { BeforeAfterShowcase, type BeforeAfterTab } from "@/components/home/BeforeAfterShowcase";
 import { BrandPositioning } from "@/components/home/BrandPositioning";
 import { FaqPreviewSection } from "@/components/home/FaqPreviewSection";
@@ -92,10 +93,15 @@ export default async function HomePage() {
   ].filter((tab) => tab.before && tab.after);
 
   const finalCta = findSection(page, "final_cta");
+  const hero = findSection(page, "hero");
 
   return (
     <>
-      <Hero section={findSection(page, "hero")} />
+      <CinematicIntro
+        tagline={hero?.heading || undefined}
+      />
+
+      <Hero section={hero} />
 
       <BrandPositioning section={findSection(page, "brand_positioning")} />
 

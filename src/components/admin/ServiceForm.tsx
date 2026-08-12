@@ -107,7 +107,12 @@ export function ServiceForm({
       if (serviceId) {
         const result = await updateService(serviceId, form);
         if (result.ok) {
-          toast("Service saved", "success");
+          toast(
+            form.published
+              ? "Service saved. Refresh the public site to view changes."
+              : "Service saved as draft. Turn on Published to show it on the public site.",
+            "success",
+          );
           router.refresh();
         } else {
           toast(result.error, "error");
