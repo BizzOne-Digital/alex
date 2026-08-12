@@ -49,7 +49,7 @@ export function Footer({ settings, services }: FooterProps) {
     { label: "YouTube", href: settings.youtubeUrl },
   ].filter((s) => isValidSocialUrl(s.href)) as { label: string; href: string }[];
 
-  const logoSrc = settings.footerLogo || "/brand/ikasa-logo-light.svg";
+  const logoSrc = settings.footerLogo || "/brand/ikasa-renovations-logo.png";
 
   return (
     <footer className="section-dark relative mt-auto shrink-0 overflow-x-clip bg-ikasa-black text-ikasa-white">
@@ -70,9 +70,9 @@ export function Footer({ settings, services }: FooterProps) {
               <Image
                 src={logoSrc}
                 alt={settings.companyName}
-                width={160}
-                height={40}
-                className="h-9 w-auto"
+                width={200}
+                height={52}
+                className="h-10 w-auto"
               />
             </Link>
             {settings.shortDescription ? (

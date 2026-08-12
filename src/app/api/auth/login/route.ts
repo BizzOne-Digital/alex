@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth";
+import {
+  findAdminCredentials,
+  touchAdminLogin,
+} from "@/lib/admin/admin-auth";
 import { loginSchema } from "@/lib/validations/auth";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
-import { AdminUser } from "@/models/AdminUser";
 
 const LOGIN_LIMIT = 5;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
@@ -36,20 +38,16 @@ export async function POST(request: Request) {
     }
 
     const { email, password } = parsed.data;
-    await connectDB();
+    const admin = await findAdminCredentials(email);
 
-    const user = await AdminUser.findOne({ email, isActive: true }).select(
-      "+passwordHash",
-    );
-
-    if (!user || !user.passwordHash) {
+    if (!admin?.passwordHash) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 },
       );
     }
 
-    const valid = await verifyPassword(password, user.passwordHash);
+    const valid = await verifyPassword(password, admin.passwordHash);
     if (!valid) {
       return NextResponse.json(
         { error: "Invalid email or password" },
@@ -57,18 +55,16 @@ export async function POST(request: Request) {
       );
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
-
-    await createSession(user._id.toString(), user.email);
+    await touchAdminLogin(admin.id);
+    await createSession(admin.id, admin.email);
 
     return NextResponse.json({
       ok: true,
       user: {
-        id: user._id.toString(),
-        email: user.email,
-        name: user.name,
-        role: user.role,
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: "admin",
       },
     });
   } catch (error) {

@@ -125,7 +125,7 @@ export function Header({ settings, services }: HeaderProps) {
     return () => document.removeEventListener("mousedown", onClick);
   }, [servicesOpen]);
 
-  const logoSrc = settings.headerLogo || "/brand/ikasa-logo-light.svg";
+  const logoSrc = settings.headerLogo || "/brand/ikasa-renovations-logo.png";
 
   return (
     <>
@@ -147,9 +147,9 @@ export function Header({ settings, services }: HeaderProps) {
             <Image
               src={logoSrc}
               alt={settings.companyName}
-              width={148}
-              height={36}
-              className="h-8 w-auto sm:h-9"
+              width={180}
+              height={48}
+              className="h-9 w-auto sm:h-10"
               priority
             />
           </Link>

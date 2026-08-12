@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
-import { AdminUser } from "@/models";
+import { getAdminProfile } from "@/lib/admin/admin-auth";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 
@@ -12,10 +11,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
     redirect("/admin/login");
   }
 
-  await connectDB();
-  const user = await AdminUser.findOne({ _id: session.userId, isActive: true })
-    .select("name email")
-    .lean();
+  const user = await getAdminProfile(session.userId);
 
   if (!user) {
     redirect("/admin/login");

@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_SITE_SETTINGS.defaultSeoDescription,
   icons: {
-    icon: "/brand/ikasa-favicon.svg",
-    shortcut: "/brand/ikasa-favicon.svg",
-    apple: "/brand/ikasa-favicon.svg",
+    icon: "/brand/ikasa-favicon.png",
+    shortcut: "/brand/ikasa-favicon.png",
+    apple: "/brand/ikasa-favicon.png",
   },
   openGraph: {
     title: DEFAULT_SITE_SETTINGS.defaultSeoTitle,
@@ -50,7 +50,7 @@ const localBusinessJsonLd = {
   url: "https://ikasarenovations.ca",
   telephone: DEFAULT_SITE_SETTINGS.phoneTel,
   email: DEFAULT_SITE_SETTINGS.email,
-  image: "/brand/ikasa-logo.svg",
+  image: "/brand/ikasa-renovations-logo.png",
   priceRange: "$$",
   areaServed: {
     "@type": "Text",

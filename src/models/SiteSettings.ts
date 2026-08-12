@@ -44,6 +44,11 @@ const SiteSettingsSchema = new Schema(
     copyright: { type: String, default: "", trim: true },
     timelineDisclaimer: { type: String, default: "" },
     offerDisclaimer: { type: String, default: "" },
+    /** Used only on the singleton doc with key "admin-auth" (Atlas collection-limit fallback). */
+    adminEmail: { type: String, default: "", trim: true, lowercase: true },
+    adminPasswordHash: { type: String, default: "", select: false },
+    adminName: { type: String, default: "Ikasa Admin", trim: true },
+    adminIsActive: { type: Boolean, default: true },
   },
   { timestamps: true },
 );
