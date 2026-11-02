@@ -3,7 +3,6 @@ import { CinematicIntro } from "@/components/intro/CinematicIntro";
 import { BeforeAfterShowcase, type BeforeAfterTab } from "@/components/home/BeforeAfterShowcase";
 import { BrandPositioning } from "@/components/home/BrandPositioning";
 import { FaqPreviewSection } from "@/components/home/FaqPreviewSection";
-import { FeatureShowcase } from "@/components/home/FeatureShowcase";
 import { FeaturedGallerySection } from "@/components/home/FeaturedGallerySection";
 import { Hero } from "@/components/home/Hero";
 import { OffersSection } from "@/components/home/OffersSection";
@@ -127,26 +126,6 @@ export default async function HomePage() {
       ) : null}
 
       <OneStopProcess section={findSection(page, "one_stop")} />
-
-      <FeatureShowcase
-        section={findSection(page, "kitchen_feature")}
-        tag="Kitchen"
-        index="01"
-        tone="warm"
-      />
-      <FeatureShowcase
-        section={findSection(page, "bathroom_feature")}
-        tag="Bathroom"
-        index="02"
-        tone="black"
-        reverse
-      />
-      <FeatureShowcase
-        section={findSection(page, "closet_feature")}
-        tag="Closet"
-        index="03"
-        tone="warm"
-      />
 
       <OffersSection
         section={findSection(page, "special_offers")}
