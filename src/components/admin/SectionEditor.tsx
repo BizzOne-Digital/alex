@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, GripVertical, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -254,7 +254,9 @@ function SectionAccordionItem({
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const formRef = useRef(form);
-  formRef.current = form;
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
   const { toast } = useToast();
 
   const fields = new Set(definition.fields);

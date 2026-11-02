@@ -5,14 +5,14 @@ import {
   MAX_UPLOAD_BYTES,
   parseStoredUploadUrl,
   storedUploadPublicUrl,
-  UPLOAD_FOLDERS,
   type UploadFolder,
 } from "@/lib/upload-urls";
 import { StoredUpload } from "@/models/StoredUpload";
 
+export { UPLOAD_FOLDERS } from "@/lib/upload-urls";
+
 export {
   MAX_UPLOAD_BYTES,
-  UPLOAD_FOLDERS,
   type UploadFolder,
   assertUploadFolder,
   isStoredUploadUrl,
