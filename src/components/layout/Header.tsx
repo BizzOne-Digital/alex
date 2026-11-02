@@ -25,7 +25,6 @@ const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/services", label: "Services", hasDropdown: true },
   { href: "/gallery", label: "Gallery" },
-  { href: "/testimonials", label: "Testimonials" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ] as const;
