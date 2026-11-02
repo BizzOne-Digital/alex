@@ -61,7 +61,7 @@ export default async function AboutPage() {
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <ImageWithFallback
                     src={introduction.primaryImage || ""}
-                    alt="Renovation planning — illustrative reference"
+                    alt={introduction.imageAlt || "Completed Ikasa Renovations kitchen"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 45vw"
@@ -106,7 +106,7 @@ export default async function AboutPage() {
               <div className="relative aspect-[4/5] overflow-hidden border border-white/10">
                 <ImageWithFallback
                   src={philosophy.secondaryImage || ""}
-                  alt="Living space atmosphere — illustrative reference"
+                  alt="Completed bathroom by Ikasa Renovations"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 40vw"
@@ -141,7 +141,7 @@ export default async function AboutPage() {
                 <div className="relative aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-full">
                   <ImageWithFallback
                     src={oneStop.primaryImage || ""}
-                    alt="Installation coordination — illustrative reference"
+                    alt="Finished kitchen installation"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 45vw"
@@ -211,7 +211,7 @@ export default async function AboutPage() {
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <ImageWithFallback
                     src={guidance.primaryImage || ""}
-                    alt="Product and appliance selection — illustrative reference"
+                    alt="Cabinet storage accessories and appliances"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 45vw"
@@ -242,7 +242,7 @@ export default async function AboutPage() {
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <ImageWithFallback
                       src={timeline.primaryImage || ""}
-                      alt="Project timing — illustrative reference"
+                      alt="Completed bathroom with tiled floor"
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 45vw"
@@ -305,10 +305,6 @@ export default async function AboutPage() {
                 );
               })}
             </div>
-            <p className="mt-6 text-center text-xs text-ikasa-medium-grey">
-              Stock design references, not completed Ikasa Renovations
-              projects.
-            </p>
           </Container>
         </section>
       ) : null}
