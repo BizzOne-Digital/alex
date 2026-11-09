@@ -44,3 +44,6 @@ next-env.d.ts
 # raw photo dumps (large; web-ready copies live in public/images/site)
 public/WEBSITE PHOTOS/
 public/WEBSITE PHOTOS.zip
+
+# database dumps (contain admin hashes and customer PII)
+/backup/

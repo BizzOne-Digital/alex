@@ -163,4 +163,4 @@ Palette accent: Ikasa Red `#D60000` on architectural black/white/grey.
 ## Contact (seed defaults)
 
 - Email: contact@ikasarenovations.ca
-- Phone: 647-377-3694 (`tel:+16473773694`)
+- Phone: +1 (855) 55-IKASA / +1 (855) 55-45272 (`tel:+18555545272`)

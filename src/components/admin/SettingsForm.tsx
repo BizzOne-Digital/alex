@@ -110,8 +110,8 @@ export function SettingsForm({ initial }: { initial: SettingsFormValues }) {
         </div>
         <Textarea label="Short description" value={form.shortDescription} onChange={(e) => patch({ shortDescription: e.target.value })} rows={3} />
         <div className="grid gap-4 sm:grid-cols-3">
-          <Input label="Primary phone (display)" value={form.primaryPhone} onChange={(e) => patch({ primaryPhone: e.target.value })} placeholder="647-377-3694" />
-          <Input label="Phone (tel: link)" value={form.phoneTel} onChange={(e) => patch({ phoneTel: e.target.value })} placeholder="+16473773694" />
+          <Input label="Primary phone (display)" value={form.primaryPhone} onChange={(e) => patch({ primaryPhone: e.target.value })} placeholder="+1 (855) 55-IKASA" />
+          <Input label="Phone (tel: link)" value={form.phoneTel} onChange={(e) => patch({ phoneTel: e.target.value })} placeholder="+18555545272" />
           <Input label="Secondary phone" value={form.secondaryPhone} onChange={(e) => patch({ secondaryPhone: e.target.value })} />
         </div>
         <Input label="Address" value={form.address} onChange={(e) => patch({ address: e.target.value })} />

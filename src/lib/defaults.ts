@@ -5,8 +5,8 @@ export const DEFAULT_SITE_SETTINGS = {
   shortDescription:
     "Ikasa Renovations helps homeowners transform outdated kitchens, bathrooms, closets, and interior spaces into beautiful, organised, functional environments—through design, product guidance, supply, installation, and complete renovation coordination.",
   email: "contact@ikasarenovations.ca",
-  primaryPhone: "647-377-3694",
-  phoneTel: "+16473773694",
+  primaryPhone: "+1 (855) 55-IKASA",
+  phoneTel: "+18555545272",
   secondaryPhone: "",
   address: "",
   serviceArea:
