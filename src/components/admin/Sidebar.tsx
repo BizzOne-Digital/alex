@@ -35,9 +35,12 @@ export function Sidebar({ userName, userEmail }: SidebarProps) {
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-neutral-800 bg-neutral-950">
       <div className="flex items-center gap-2.5 border-b border-neutral-800 px-5 py-5">
-        <span className="flex h-8 w-8 items-center justify-center rounded bg-red-600 font-heading text-sm font-bold text-white">
-          IK
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/ikasa-favicon.png"
+          alt="Ikasa"
+          className="h-9 w-9 rounded bg-white object-contain"
+        />
         <div>
           <p className="font-heading text-sm leading-none text-white">Ikasa Admin</p>
           <p className="text-[0.68rem] text-neutral-500">Renovations CMS</p>

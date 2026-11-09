@@ -32,9 +32,12 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-600 font-heading text-lg font-bold text-white shadow-lg shadow-red-600/30">
-            IK
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/ikasa-favicon.png"
+            alt="Ikasa Renovations"
+            className="h-16 w-16 rounded-lg bg-white object-contain shadow-lg shadow-red-600/30"
+          />
           <div>
             <p className="font-label text-[0.7rem] tracking-[0.22em] text-red-500">
               Ikasa Renovations
