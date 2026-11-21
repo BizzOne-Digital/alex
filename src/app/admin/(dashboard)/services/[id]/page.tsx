@@ -33,6 +33,7 @@ export default async function EditServicePage({
     processImage: service.processImage ?? "",
     featureImage: service.featureImage ?? "",
     galleryImages: service.galleryImages ?? [],
+    videos: service.videos ?? [],
     beforeImage: service.beforeImage ?? "",
     afterImage: service.afterImage ?? "",
     imageAlt: service.imageAlt ?? "",

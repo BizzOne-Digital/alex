@@ -83,6 +83,7 @@ export const serviceSchema = z.object({
   processImage: imagePath,
   featureImage: imagePath,
   galleryImages: z.array(z.string()).optional().default([]),
+  videos: z.array(z.string()).optional().default([]),
   beforeImage: imagePath,
   afterImage: imagePath,
   imageAlt: z.string().trim().max(200).optional().default(""),

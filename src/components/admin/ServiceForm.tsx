@@ -22,6 +22,7 @@ export type ServiceFormValues = {
   processImage: string;
   featureImage: string;
   galleryImages: string[];
+  videos: string[];
   beforeImage: string;
   afterImage: string;
   imageAlt: string;
@@ -54,6 +55,7 @@ export const EMPTY_SERVICE: ServiceFormValues = {
   processImage: "",
   featureImage: "",
   galleryImages: [],
+  videos: [],
   beforeImage: "",
   afterImage: "",
   imageAlt: "",
@@ -291,6 +293,12 @@ export function ServiceForm({
             values={form.galleryImages}
             onChange={(galleryImages) => patch({ galleryImages })}
             folder="misc"
+          />
+          <StringListEditor
+            label="Videos (file paths such as /videos/appliance-installation.mp4)"
+            values={form.videos}
+            onChange={(videos) => patch({ videos })}
+            placeholder="/videos/your-video.mp4"
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <ImageUploader

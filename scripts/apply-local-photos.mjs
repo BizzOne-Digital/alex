@@ -23,6 +23,7 @@ const b = (n) => p(`bath-${n}`);
 const c = (n) => p(`closet-${n}`);
 const s = (n) => p(`storage-${n}`);
 const f = (n) => p(`fixture-${n}`);
+const a = (n) => p(`appliance-${n}`);
 
 const IMG = {
   // Kitchens
@@ -228,12 +229,13 @@ const SERVICE_SETS = {
     galleryImages: [IMG.marble, IMG.marble2, k(5547), IMG.bathPebble, b(2987), IMG.greyKitchen],
   },
   appliance: {
-    listingImage: IMG.builtInMicrowave,
-    heroImage: k(7786),
-    overviewImage: k(4585),
-    processImage: IMG.range,
-    featureImage: IMG.range2,
-    galleryImages: [IMG.builtInMicrowave, k(7786), k(4585), IMG.range, IMG.range2, f(3208)],
+    listingImage: a(1),
+    heroImage: a(7),
+    overviewImage: a(3),
+    processImage: a(5),
+    featureImage: a(2),
+    galleryImages: [a(1), a(2), a(3), a(4), a(5), a(6), a(7)],
+    videos: ["/videos/appliance-installation.mp4"],
   },
   storage: {
     listingImage: IMG.cornerCarousel,
@@ -263,6 +265,16 @@ const MATERIAL_IMAGES = {
   "Quartz countertops": f(3772),
   Quartz: f(3772),
   "Hexagon and marble-look backsplash": k(1382),
+  "Stainless steel": a(1),
+  "Covers, Boxes": a(6),
+  "Trim kits": a(7),
+};
+
+const DESIGN_OPTION_IMAGES = {
+  "Built-in microwave": a(2),
+  "Double wall oven": a(1),
+  "Range with hood": a(6),
+  "Integrated dishwasher": a(4),
 };
 
 function serviceSetFor(slug) {
@@ -351,7 +363,10 @@ async function main() {
       continue;
     }
     const pool = set.galleryImages;
-    const designOptions = (service.designOptions || []).map((opt, i) => ({ ...opt, image: pool[i % pool.length] }));
+    const designOptions = (service.designOptions || []).map((opt, i) => ({
+      ...opt,
+      image: DESIGN_OPTION_IMAGES[opt.title] || pool[i % pool.length],
+    }));
     const materials = (service.materials || []).map((mat, i) => ({ ...mat, image: MATERIAL_IMAGES[mat.name] || pool[(i + 1) % pool.length] }));
     const processSteps = (service.processSteps || []).map((step, i) => ({
       ...step,

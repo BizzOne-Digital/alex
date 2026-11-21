@@ -146,7 +146,7 @@ export function Header({ settings, services }: HeaderProps) {
             <Image
               src={logoSrc}
               alt={settings.companyName}
-              width={90}
+              width={56}
               height={56}
               className="h-12 w-auto sm:h-14"
               priority

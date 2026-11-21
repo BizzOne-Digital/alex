@@ -46,6 +46,7 @@ const ServiceSchema = new Schema(
     processImage: { type: String, default: "" },
     featureImage: { type: String, default: "" },
     galleryImages: { type: [String], default: [] },
+    videos: { type: [String], default: [] },
     beforeImage: { type: String, default: "" },
     afterImage: { type: String, default: "" },
     imageAlt: { type: String, default: "", trim: true },

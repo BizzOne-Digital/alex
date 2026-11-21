@@ -148,21 +148,44 @@ export default async function ServiceDetailPage({
         </section>
       ) : null}
 
+      {/* Videos */}
+      {service.videos?.length ? (
+        <section className="section-dark bg-ikasa-black py-24 text-ikasa-white lg:py-28">
+          <Container>
+            <SectionHeading eyebrow="Watch" title="See Our Work in Action" tone="light" />
+            <div className="mt-12 grid gap-6 sm:grid-cols-2">
+              {service.videos.map((video, i) => (
+                <video
+                  key={video + i}
+                  src={video}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-video w-full border border-white/10 bg-black object-contain"
+                  aria-label={`${service.title} video ${i + 1}`}
+                />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
       {/* Gallery images */}
       {service.galleryImages?.length ? (
         <section className="bg-ikasa-warm-white py-24 lg:py-28">
           <Container>
             <SectionHeading eyebrow="Gallery" title="Design References" />
-            <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="mt-12 columns-2 gap-4 sm:columns-3 lg:columns-4">
               {service.galleryImages.map((image, i) => (
                 <Reveal key={image + i} delay={i * 0.06}>
-                  <div className="relative aspect-[3/4] overflow-hidden">
+                  <div className="mb-4 overflow-hidden">
                     <ImageWithFallback
                       src={image}
                       alt={`${service.title} design reference ${i + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-500 hover:scale-110"
-                      sizes="(max-width: 768px) 50vw, 20vw"
+                      width={0}
+                      height={0}
+                      className="h-auto w-full transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
                 </Reveal>
