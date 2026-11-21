@@ -19,7 +19,7 @@
   --accent: var(--ikasa-red);
   --accent-deep: var(--ikasa-deep-red);
 
-  --header-height: 5rem;
+  --header-height: 6rem;
   --container-max: 76rem;
   --section-y: clamp(4.5rem, 8vw, 7.5rem);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);

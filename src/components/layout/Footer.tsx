@@ -70,9 +70,9 @@ export function Footer({ settings, services }: FooterProps) {
               <Image
                 src={logoSrc}
                 alt={settings.companyName}
-                width={80}
-                height={80}
-                className="h-20 w-auto"
+                width={168}
+                height={112}
+                className="h-28 w-auto"
               />
             </Link>
             {settings.shortDescription ? (
