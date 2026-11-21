@@ -88,11 +88,6 @@ export function BrandPositioning({ section }: BrandPositioningProps) {
                   sizes="(max-width: 1024px) 40vw, 24vw"
                 />
               </div>
-              <div className="relative col-span-12 row-span-2 row-start-11 flex items-center bg-ikasa-black px-5 sm:px-6">
-                <p className="font-label text-[0.62rem] tracking-[0.2em] text-ikasa-red sm:text-[0.68rem]">
-                  Stock design references
-                </p>
-              </div>
             </div>
           </Reveal>
         </div>
