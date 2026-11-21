@@ -145,7 +145,7 @@ export default async function TestimonialsPage() {
         <section className="bg-ikasa-black py-4">
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-5">
             {imageStrip.items.map((item, i) => (
-              <div key={i} className="relative aspect-square overflow-hidden">
+              <div key={i} className="relative aspect-[3/4] overflow-hidden">
                 <ImageWithFallback
                   src={item.image || ""}
                   alt="Renovation atmosphere reference"

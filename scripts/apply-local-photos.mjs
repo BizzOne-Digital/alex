@@ -253,6 +253,18 @@ const SERVICE_SETS = {
   },
 };
 
+// Material photos chosen by name so each photo shows the material in its caption.
+// Anything not listed falls back to the service's gallery pool.
+const MATERIAL_IMAGES = {
+  "Large-format porcelain tile": b(2942), // large marble-look floor tile
+  "Pebble shower floor": b(2989), // pebble shower floor
+  "Matte black fixtures": b(5560), // black faucet, towel ring, handles
+  "Quartz vanity tops": b(5564), // quartz vanity top and sink
+  "Quartz countertops": f(3772),
+  Quartz: f(3772),
+  "Hexagon and marble-look backsplash": k(1382),
+};
+
 function serviceSetFor(slug) {
   if (slug.includes("appliance")) return SERVICE_SETS.appliance;
   if (slug.includes("counter") || slug.includes("quartz") || slug.includes("granite")) {
@@ -340,7 +352,7 @@ async function main() {
     }
     const pool = set.galleryImages;
     const designOptions = (service.designOptions || []).map((opt, i) => ({ ...opt, image: pool[i % pool.length] }));
-    const materials = (service.materials || []).map((mat, i) => ({ ...mat, image: pool[(i + 1) % pool.length] }));
+    const materials = (service.materials || []).map((mat, i) => ({ ...mat, image: MATERIAL_IMAGES[mat.name] || pool[(i + 1) % pool.length] }));
     const processSteps = (service.processSteps || []).map((step, i) => ({
       ...step,
       image: [set.processImage, set.overviewImage, set.featureImage, set.heroImage][i % 4],

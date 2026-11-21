@@ -135,14 +135,14 @@ export function BookingForm({ services, bookingMessage }: BookingFormProps) {
       >
         <CheckCircle2 className="h-12 w-12 text-ikasa-red" />
         <h3 className="font-heading text-2xl tracking-tight sm:text-3xl">
-          Request Received
+          Appointment Request Received
         </h3>
         <p className="max-w-md text-sm leading-relaxed text-ikasa-light-grey/85">
           {bookingMessage ||
             "Your selected date and time is a requested appointment. An Ikasa Renovations team member will contact you to confirm availability."}
         </p>
         <Button variant="outline" onClick={() => setSuccess(false)}>
-          Submit Another Request
+          Book Another Appointment
         </Button>
       </motion.div>
     );
@@ -327,7 +327,7 @@ export function BookingForm({ services, bookingMessage }: BookingFormProps) {
         <MagneticButton type="submit" disabled={submitting}>
           <span className={cn("inline-flex items-center justify-center gap-2 bg-ikasa-red px-8 h-14 font-label text-sm tracking-[0.14em] uppercase text-ikasa-white transition-colors hover:bg-ikasa-deep-red", submitting && "opacity-70")}>
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {submitting ? "Sending..." : "Request Consultation"}
+            {submitting ? "Sending..." : "Book Consultation"}
           </span>
         </MagneticButton>
       </div>

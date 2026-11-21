@@ -67,7 +67,7 @@ export default async function ServicesPage() {
               description={overview.content}
             />
             <Reveal direction="left">
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/5] overflow-hidden">
                 <ImageWithFallback
                   src={overview.primaryImage || ""}
                   alt="Renovation planning — illustrative reference"
@@ -100,7 +100,7 @@ export default async function ServicesPage() {
                     i % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""
                   }`}
                 >
-                  <div className="relative aspect-[16/10] overflow-hidden">
+                  <div className="relative aspect-[4/5] overflow-hidden">
                     <ImageWithFallback
                       src={service.listingImage || ""}
                       alt={service.title}
@@ -141,7 +141,7 @@ export default async function ServicesPage() {
               .map((item, i) => (
                 <Reveal key={item?.key || i} delay={i * 0.1}>
                   <div className="group relative flex h-full flex-col overflow-hidden border border-ikasa-light-grey">
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <ImageWithFallback
                         src={item?.primaryImage || ""}
                         alt={item?.heading || ""}
@@ -170,7 +170,7 @@ export default async function ServicesPage() {
         <section className="section-dark bg-ikasa-black py-24 text-ikasa-white lg:py-28">
           <Container className="grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
             <Reveal>
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/5] overflow-hidden">
                 <ImageWithFallback
                   src={productGuidance.primaryImage || ""}
                   alt="Appliance and product guidance — illustrative reference"
@@ -241,7 +241,7 @@ export default async function ServicesPage() {
             <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-5">
               {collage.items.map((item, i) => (
                 <Reveal key={item.title || i} delay={i * 0.06}>
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <ImageWithFallback
                       src={item.image || ""}
                       alt={item.title || "Material reference"}

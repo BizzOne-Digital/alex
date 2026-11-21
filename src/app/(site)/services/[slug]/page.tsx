@@ -156,7 +156,7 @@ export default async function ServiceDetailPage({
             <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
               {service.galleryImages.map((image, i) => (
                 <Reveal key={image + i} delay={i * 0.06}>
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <ImageWithFallback
                       src={image}
                       alt={`${service.title} design reference ${i + 1}`}
@@ -181,7 +181,7 @@ export default async function ServiceDetailPage({
               {service.designOptions.slice(0, 3).map((option, i) => (
                 <Reveal key={option.title} delay={i * 0.1} className="h-full">
                   <div className="group relative flex h-full flex-col overflow-hidden border border-white/10">
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <ImageWithFallback
                         src={option.image || ""}
                         alt={option.title}
@@ -214,7 +214,7 @@ export default async function ServiceDetailPage({
             <div className="mt-14 grid gap-6 sm:grid-cols-3">
               {service.materials.map((material) => (
                 <div key={material.name} className="group relative overflow-hidden">
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <ImageWithFallback
                       src={material.image || ""}
                       alt={material.name}
@@ -246,7 +246,7 @@ export default async function ServiceDetailPage({
                 .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                 .map((step, i) => (
                   <Reveal key={step.title} delay={i * 0.1}>
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <ImageWithFallback
                         src={step.image || ""}
                         alt={step.title}

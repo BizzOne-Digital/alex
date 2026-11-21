@@ -5,6 +5,20 @@ import { Reveal } from "@/components/motion/Reveal";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { PageHero } from "@/components/sections/PageHero";
 import { Container } from "@/components/ui/Container";
+
+const DEFAULT_INTRO = {
+  heading: "What We Will Cover in Your In Home Consultation",
+  content:
+    "We visit your home, look at the space with you and talk through your plans. There is no cost and no obligation. Here is what we will go over together:",
+  lists: [
+    "Your goals, style ideas and how you use the space",
+    "On-site measurements and a look at the current layout",
+    "Materials, finishes and fixtures that suit your budget",
+    "A realistic budget range and project timeline",
+    "Next steps and a clear written quote after the visit",
+    "Answers to any questions you have about the process",
+  ],
+};
 import {
   findSection,
   getPageBySlug,
@@ -33,7 +47,11 @@ export default async function BookingPage() {
   ]);
 
   const hero = findSection(page, "hero");
-  const intro = findSection(page, "intro");
+  const introSection = findSection(page, "intro");
+  const intro =
+    introSection && introSection.heading && introSection.lists?.length
+      ? introSection
+      : { ...DEFAULT_INTRO, ...(introSection?.heading ? { heading: introSection.heading } : {}) };
   const form = findSection(page, "form");
   const assurance = findSection(page, "assurance");
   const finalCta = findSection(page, "final_cta");
@@ -42,7 +60,7 @@ export default async function BookingPage() {
     <>
       <PageHero
         eyebrow={hero?.eyebrow || "Consultation"}
-        title={hero?.heading || "Book Your Free Renovation Consultation"}
+        title={hero?.heading || "Book Your Free In Home Consultation"}
         subheading={hero?.subheading}
         image={hero?.primaryImage || hero?.backgroundImage}
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Booking" }]}
@@ -84,10 +102,10 @@ export default async function BookingPage() {
         <Container narrow>
           <div className="mb-12 text-center text-ikasa-warm-white">
             <p className="font-label text-[0.68rem] tracking-[0.22em] text-ikasa-red">
-              Request an Appointment
+              Book an Appointment
             </p>
             <h2 className="mt-4 font-heading text-3xl tracking-tight sm:text-4xl">
-              {form?.heading || "Request an Appointment"}
+              {form?.heading || "Book an Appointment"}
             </h2>
             {form?.content ? (
               <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ikasa-light-grey/80">
